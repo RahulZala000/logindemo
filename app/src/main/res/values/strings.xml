@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">LoginDemo</string>
+    <string name="client_id">806307821550-g6bn430lmqc1u7l8199v2push2e9917u.apps.googleusercontent.com</string>
+
+
+    <string name="facebook_app_id">716789609314662</string>
+    <string name="fb_login_protocol_scheme">fb716789609314662</string>
+    <string name="facebook_client_token">5748250af8d7314399dcd4c3180925e3</string>
+
+
+</resources>
