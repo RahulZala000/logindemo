@@ -5,15 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:background="@color/white"
     tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="375dp"
-        android:layout_height="409dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="100dp"
         android:background="@drawable/login_page"
         android:orientation="vertical">
 
@@ -23,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
-            android:text="Login"
+            android:text="Email "
             android:textColor="@color/white"
             android:textSize="30dp" />
 
@@ -32,17 +31,18 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
-            android:text="Username"
+            android:text="Old Email"
             android:textColor="@color/white"
             android:textSize="20dp" />
 
         <EditText
 
-            android:id="@+id/signemail"
+            android:id="@+id/signupemailold"
             android:layout_width="330dp"
             android:layout_height="35dp"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
+            android:editable="false"
             android:background="@drawable/circle"
             android:inputType="textEmailAddress"
             android:padding="5dp" />
@@ -52,89 +52,40 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
-            android:text="Password"
+            android:text="New Email"
             android:textColor="@color/white"
             android:textSize="20dp" />
 
         <EditText
-            android:id="@+id/signpass"
+
+            android:id="@+id/signupemailnew"
             android:layout_width="330dp"
             android:layout_height="35dp"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
             android:background="@drawable/circle"
-            android:inputType="textPassword"
-            android:padding="5dp"
-            tools:ignore="InvalidId" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:text="OR"
-            android:textColor="@color/white"
-            android:textSize="20dp" />
-
-        <ImageView
-            android:id="@+id/signgoogle"
-            android:layout_width="200dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:clickable="true"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/google" />
-        <ImageView
-            android:id="@+id/signtwitter"
-            android:layout_width="200dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:clickable="true"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/google" />
-
+            android:inputType="textEmailAddress"
+            android:padding="5dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/login_page"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/forgot_click"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:text="Forgot password?"
-                android:textColor="@color/yellow"
-                android:textSize="20dp" />
-
             <Button
-                android:id="@+id/login_click"
+                android:id="@+id/emailclick"
                 android:layout_width="80dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="90dp"
+                android:layout_marginLeft="275dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/sub"
-                android:text="Login"
+                android:text="Submit"
                 android:textColor="@color/white"
                 android:textSize="10dp" />
 
-
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/new_user"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:clickable="true"
-            android:text="New User?"
-            android:textColor="@color/yellow"
-            android:textSize="15dp" />
-
 
     </LinearLayout>
 

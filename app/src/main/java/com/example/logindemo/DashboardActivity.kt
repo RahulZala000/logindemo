@@ -45,5 +45,14 @@ class DashboardActivity : AppCompatActivity() {
             googleclient.signOut()
             finish()
         }
+        binding.emailclick.setOnClickListener {
+            i = Intent(this, EmailChangeActivity::class.java)
+            startActivity(i)
+        }
+
+        binding.passclick.setOnClickListener {
+            i = Intent(this, PasswordChangeActivity::class.java)
+            startActivity(i)
+        }
     }
 }

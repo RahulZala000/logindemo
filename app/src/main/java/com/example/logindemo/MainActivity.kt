@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.example.logindemo.databinding.ActivityMainBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -14,6 +15,16 @@ import com.google.android.material.internal.TextDrawableHelper
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import androidx.annotation.NonNull
+import com.facebook.appevents.ml.ModelManager
+
+import com.google.android.gms.tasks.OnFailureListener
+
+import com.google.firebase.auth.AuthResult
+
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     var i=intent
     var auth = Firebase.auth
     lateinit var googleclient: GoogleSignInClient
+    lateinit var loginprogress:ProgressBar
 
     companion object{
         const val sign=25
@@ -31,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        auth.
 
         val gso = GoogleSignInOptions
             .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -67,10 +78,39 @@ class MainActivity : AppCompatActivity() {
 
             signgoogle()
         }
+        binding.signtwitter.setOnClickListener{
+            Task->
+
+            val pendingResultTask: Task<AuthResult> = auth.getPendingAuthResult()!!
+            if (pendingResultTask != null) {
+                // There's something already here! Finish the sign-in for your user.
+                pendingResultTask
+                    .addOnSuccessListener(
+
+
+                        OnSuccessListener<AuthResult?> {
+                            // User is signed in.
+                            // IdP data available in
+                            // authResult.getAdditionalUserInfo().getProfile().
+                            // The OAuth access token can also be retrieved:
+                            // authResult.getCredential().getAccessToken().
+                            // The OAuth secret can be retrieved by calling:
+                            // authResult.getCredential().getSecret().
+                        })
+                    .addOnFailureListener(
+                        OnFailureListener {
+                            // Handle failure.
+                        })
+            } else {
+                // There's no pending result so you need to start the sign-in flow.
+                // See below.
+            }
+        }
     }
 
     private fun signgoogle()
     {
+
         var signIntent=googleclient.signInIntent
         startActivityForResult(signIntent, SignUpActivity.sign)
 
@@ -126,6 +166,11 @@ class MainActivity : AppCompatActivity() {
                     {
                         startActivity(i)
                     }
+                    else if(email!=auth.currentUser!!.email)
+                    {
+                        Toast.makeText(this,"User is Not Registed",Toast.LENGTH_SHORT).show()
+                        binding.signemail.setError("Enter Valid Email Address")
+                    }
                     else
                     {
                         Toast.makeText(this,"Your Email Is Not Verified",Toast.LENGTH_SHORT).show()
@@ -140,12 +185,12 @@ class MainActivity : AppCompatActivity() {
 
         if((email=="")&&(pass==""))
         {
-            binding.signemail.setError("Input name")
+            binding.signemail.setError("Input Email")
             binding.signpass.setError("Input Password")
             return false
         }
         else if(email=="") {
-            binding.signemail.setError("Input name")
+            binding.signemail.setError("Input Email")
             return false
         }
         else if(pass=="") {
