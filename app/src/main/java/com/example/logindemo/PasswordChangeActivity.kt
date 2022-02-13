@@ -39,7 +39,7 @@ class PasswordChangeActivity : AppCompatActivity() {
 
             if(infocheck())
             {
-                Firebase.auth.currentUser!!.updatePassword(newPass)
+                Firebase.auth.currentUser!!.updatePassword(binding.signupemailnew.text.toString())
                 i = Intent(this, DashboardActivity::class.java)
                 startActivity(i)
             }

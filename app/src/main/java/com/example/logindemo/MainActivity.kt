@@ -24,6 +24,7 @@ import com.google.firebase.auth.AuthResult
 
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     var auth = Firebase.auth
     lateinit var googleclient: GoogleSignInClient
     lateinit var loginprogress:ProgressBar
+    var  db:FirebaseFirestore? = FirebaseFirestore.getInstance()
 
     companion object{
         const val sign=25
@@ -81,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         binding.signtwitter.setOnClickListener{
             Task->
 
-            val pendingResultTask: Task<AuthResult> = auth.getPendingAuthResult()!!
+            val pendingResultTask: Task<AuthResult> = auth.getPendingAuthResult() as Task<AuthResult>
             if (pendingResultTask != null) {
                 // There's something already here! Finish the sign-in for your user.
                 pendingResultTask
@@ -89,6 +91,9 @@ class MainActivity : AppCompatActivity() {
 
 
                         OnSuccessListener<AuthResult?> {
+
+                            i = Intent(this, DashboardActivity::class.java)
+                            startActivity(i)
                             // User is signed in.
                             // IdP data available in
                             // authResult.getAdditionalUserInfo().getProfile().

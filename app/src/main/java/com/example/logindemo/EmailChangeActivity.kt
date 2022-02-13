@@ -39,14 +39,20 @@ class EmailChangeActivity : AppCompatActivity() {
 
            if(infocheck())
            {
-                auth.currentUser!!.updateEmail(newEmail).addOnCompleteListener{
+                auth.currentUser!!.updateEmail(binding.signupemailnew.text.toString()).addOnCompleteListener{
                     task->
                     if(task.isSuccessful)
                     {
-                        auth.updateCurrentUser(auth.currentUser!!)
-                        Toast.makeText(this,"error",Toast.LENGTH_SHORT).show()
-                        i = Intent(this, DashboardActivity::class.java)
-                        startActivity(i)
+                      //  auth.updateCurrentUser(auth.currentUser!!)
+                        auth!!.currentUser?.sendEmailVerification()
+                            ?.addOnCompleteListener{
+                                if(it.isSuccessful) {
+                                    Toast.makeText(this,"Email sent",Toast.LENGTH_SHORT).show()
+                                    i = Intent(this, DashboardActivity::class.java)
+                                    startActivity(i)
+                                }
+                            }
+
                     }
                 }
 
