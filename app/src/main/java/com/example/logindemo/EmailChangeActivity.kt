@@ -1,14 +1,15 @@
 package com.example.logindemo
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.logindemo.databinding.ActivityEmailChangeBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.ktx.*
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class EmailChangeActivity : AppCompatActivity() {
@@ -17,7 +18,7 @@ class EmailChangeActivity : AppCompatActivity() {
     var auth = Firebase.auth
     var i = intent
     lateinit var googleclient: GoogleSignInClient
-
+    var loading=LoadingDialog(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,26 +40,31 @@ class EmailChangeActivity : AppCompatActivity() {
 
            if(infocheck())
            {
-                auth.currentUser!!.updateEmail(binding.signupemailnew.text.toString()).addOnCompleteListener{
-                    task->
-                    if(task.isSuccessful)
-                    {
-                      //  auth.updateCurrentUser(auth.currentUser!!)
-                        auth!!.currentUser?.sendEmailVerification()
-                            ?.addOnCompleteListener{
-                                if(it.isSuccessful) {
-                                    Toast.makeText(this,"Email sent",Toast.LENGTH_SHORT).show()
-                                    i = Intent(this, DashboardActivity::class.java)
-                                    startActivity(i)
-                                }
-                            }
+               loading.startloading()
+               var handler= Handler()
+               handler.postDelayed(object : Runnable{
+                   override fun run()
+                   {
+                       loading.isdismis()
+                   }
+               },1000)
 
+                auth.currentUser!!.updateEmail(binding.signupemailnew.text.toString()).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(this, "Email Is Updte", Toast.LENGTH_SHORT).show()
+                        i = Intent(this, DashboardActivity::class.java)
+                        startActivity(i)
+                        finish()
+                    }
+                    if(task.isComplete)
+                    {
+                        Toast.makeText(this, "Email Is Already Register", Toast.LENGTH_SHORT).show()
                     }
                 }
+           }
 
             }
         }
-    }
 
     private fun infocheck(): Boolean {
         var email=binding.signupemailnew.text.toString()

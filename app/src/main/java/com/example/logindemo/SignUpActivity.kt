@@ -1,12 +1,10 @@
 package com.example.logindemo
 
-import android.content.ContentValues.TAG
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
 import android.widget.Toast
-
+import androidx.appcompat.app.AppCompatActivity
 import com.example.logindemo.databinding.ActivitySignupBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -14,24 +12,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.facebook.FacebookException
-
-import com.facebook.login.LoginResult
-
-import com.facebook.FacebookCallback
-
-import com.facebook.login.LoginManager
-
-import com.facebook.CallbackManager
 import com.google.firebase.firestore.FirebaseFirestore
-import androidx.annotation.NonNull
-
-import com.google.android.gms.tasks.OnFailureListener
-
-import com.google.firebase.firestore.DocumentReference
-
-import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.ktx.Firebase
 
 
 
@@ -44,7 +26,7 @@ class SignUpActivity : AppCompatActivity() {
     var i = intent
     lateinit var googleclient:GoogleSignInClient
     var  db: FirebaseFirestore? = FirebaseFirestore.getInstance()
-
+    var loading=LoadingDialog(this)
     companion object{
         const val sign=25
     }
@@ -64,19 +46,44 @@ class SignUpActivity : AppCompatActivity() {
 
         binding.signupClick.setOnClickListener {
 
-            i = Intent(this, MainActivity::class.java)
-
             if(infocheck()) {
+                loading.startloading()
+                var handler= Handler()
+                handler.postDelayed(object : Runnable{
+                    override fun run()
+                    {
+                        loading.isdismis()
+                    }
+                },1000)
+
                 signprocess()
             }
         }
 
         binding.signgoogle.setOnClickListener{
-            i = Intent(this, MainActivity::class.java)
+            loading.startloading()
+            var handler= Handler()
+            handler.postDelayed(object : Runnable{
+                override fun run()
+                {
+                    loading.isdismis()
+                }
+            },1000)
+
+            i = Intent(this, PasswordChangeActivity::class.java)
 
             signgoogle()
         }
         binding.signfacebook.setOnClickListener{
+            loading.startloading()
+            var handler= Handler()
+            handler.postDelayed(object : Runnable{
+                override fun run()
+                {
+                    loading.isdismis()
+                }
+            },1000)
+
             i = Intent(this,FacebookAuthActivity::class.java)
 
             startActivity(i)
@@ -147,23 +154,20 @@ class SignUpActivity : AppCompatActivity() {
                 {
                     auth.createUserWithEmailAndPassword(email, pass)
                         .addOnCompleteListener(this) { task ->
-                            if (task.isSuccessful) {
-                                var user = auth.currentUser
-                                user!!.sendEmailVerification()
-                                    .addOnCompleteListener(this)
-                                    { task ->
-                                        if (task.isSuccessful) {
-
-                                            users.document(email).set(user)
-                                            Toast.makeText(this, "email sent is successfully", Toast.LENGTH_SHORT).show()
-                                            startActivity(i)
-                                        }
-                                    }
+                            if (task.isSuccessful)
+                            {
+                                i = Intent(this, DashboardActivity::class.java)
+                                users.document(email).set(user)
+                              //  i.putExtra("email",email)
+                                Toast.makeText(this, "email sent is successfully", Toast.LENGTH_SHORT).show()
+                                startActivity(i)
                             }
                         }
                 }
-                else{
-                    Toast.makeText(this,"email already register",Toast.LENGTH_SHORT).show()
+                else
+                {
+                    i = Intent(this, MainActivity::class.java)
+                    Toast.makeText(this,"Email Already Register",Toast.LENGTH_SHORT).show()
                     startActivity(i)
                 }
             }
@@ -176,12 +180,12 @@ class SignUpActivity : AppCompatActivity() {
 
         if((email=="")&&(pass==""))
         {
-            binding.signupemail.setError("Input name")
+            binding.signupemail.setError("Input Email")
             binding.signuppass.setError("Input Password")
             return false
         }
         else if(email=="") {
-            binding.signupemail.setError("Input name")
+            binding.signupemail.setError("Input Email")
             return false
         }
         else if(pass=="") {

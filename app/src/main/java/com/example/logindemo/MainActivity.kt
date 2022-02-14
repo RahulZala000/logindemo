@@ -1,30 +1,23 @@
 package com.example.logindemo
 
+import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
-import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.example.logindemo.databinding.ActivityMainBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.material.internal.TextDrawableHelper
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import androidx.annotation.NonNull
-import com.facebook.appevents.ml.ModelManager
-
-import com.google.android.gms.tasks.OnFailureListener
-
-import com.google.firebase.auth.AuthResult
-
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,15 +28,24 @@ class MainActivity : AppCompatActivity() {
     lateinit var googleclient: GoogleSignInClient
     lateinit var loginprogress:ProgressBar
     var  db:FirebaseFirestore? = FirebaseFirestore.getInstance()
-
+    lateinit var sharedPref:SharedPreferences
+    private  var editor:SharedPreferences.Editor?=null
     companion object{
         const val sign=25
     }
+    lateinit var progress:ProgressBar
+    private lateinit var isdialog:AlertDialog
+    var loading=LoadingDialog(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        var sharedPref=getSharedPreferences("Email",Context.MODE_PRIVATE)
+        var editor=sharedPref.edit()
+
 
 
         val gso = GoogleSignInOptions
@@ -54,71 +56,74 @@ class MainActivity : AppCompatActivity() {
 
         googleclient=GoogleSignIn.getClient(this,gso)
 
-
         if(auth.currentUser!=null)
         {
             i = Intent(this, DashboardActivity::class.java)
             startActivity(i)
+            finish()
         }
+
+
         binding.newUser.setOnClickListener {
+
             i = Intent(this, SignUpActivity::class.java)
             startActivity(i)
+
         }
         binding.loginClick.setOnClickListener{
+
+
             i = Intent(this, DashboardActivity::class.java)
            if(infocheck())
            {
+               loading.startloading()
+               var handler=Handler()
+               handler.postDelayed(object : Runnable{
+                   override fun run()
+                   {
+                       loading.isdismis()
+                   }
+               },1000)
+
                signprocess()
            }
         }
         binding.forgotClick.setOnClickListener{
+            loading.startloading()
+            var handler=Handler()
+            handler.postDelayed(object : Runnable{
+                override fun run()
+                {
+                    loading.isdismis()
+                }
+            },500)
+
             i = Intent(this, ForgotpassActivity::class.java)
             startActivity(i)
+            finish()
         }
         binding.signgoogle.setOnClickListener{
-            i = Intent(this, DashboardActivity::class.java)
+            loading.startloading()
+            var handler=Handler()
+            handler.postDelayed(object : Runnable{
+                override fun run()
+                {
+                    loading.isdismis()
+                }
+            },1000)
 
+            i = Intent(this, PasswordChangeActivity::class.java)
             signgoogle()
         }
-        binding.signtwitter.setOnClickListener{
-            Task->
 
-            val pendingResultTask: Task<AuthResult> = auth.getPendingAuthResult() as Task<AuthResult>
-            if (pendingResultTask != null) {
-                // There's something already here! Finish the sign-in for your user.
-                pendingResultTask
-                    .addOnSuccessListener(
-
-
-                        OnSuccessListener<AuthResult?> {
-
-                            i = Intent(this, DashboardActivity::class.java)
-                            startActivity(i)
-                            // User is signed in.
-                            // IdP data available in
-                            // authResult.getAdditionalUserInfo().getProfile().
-                            // The OAuth access token can also be retrieved:
-                            // authResult.getCredential().getAccessToken().
-                            // The OAuth secret can be retrieved by calling:
-                            // authResult.getCredential().getSecret().
-                        })
-                    .addOnFailureListener(
-                        OnFailureListener {
-                            // Handle failure.
-                        })
-            } else {
-                // There's no pending result so you need to start the sign-in flow.
-                // See below.
-            }
-        }
     }
+
+
 
     private fun signgoogle()
     {
-
         var signIntent=googleclient.signInIntent
-        startActivityForResult(signIntent, SignUpActivity.sign)
-
+        startActivityForResult(signIntent, sign)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -150,6 +155,7 @@ class MainActivity : AppCompatActivity() {
                 if(task.isSuccessful)
                 {
                     startActivity(i)
+
                 }
                 else
                 {
@@ -167,19 +173,17 @@ class MainActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if(task.isSuccessful)
                 {
-                    if(auth.currentUser!!.isEmailVerified)
-                    {
-                        startActivity(i)
+                  //  i.putExtra("email", email)
+                    editor?.apply{
+                        putString("email",email)
+                        apply()
                     }
-                    else if(email!=auth.currentUser!!.email)
-                    {
-                        Toast.makeText(this,"User is Not Registed",Toast.LENGTH_SHORT).show()
-                        binding.signemail.setError("Enter Valid Email Address")
-                    }
-                    else
-                    {
-                        Toast.makeText(this,"Your Email Is Not Verified",Toast.LENGTH_SHORT).show()
-                    }
+                    startActivity(i)
+                    finish()
+                }
+                else if(task.isComplete)
+                {
+                         Toast.makeText(this, "Plz Enter Valid Email And Password", Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -207,4 +211,8 @@ class MainActivity : AppCompatActivity() {
             return true
         }
     }
+
+
 }
+
+

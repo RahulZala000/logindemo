@@ -1,14 +1,14 @@
 package com.example.logindemo
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.logindemo.databinding.ActivityEmailChangeBinding
+import android.os.Handler
+import androidx.appcompat.app.AppCompatActivity
 import com.example.logindemo.databinding.ActivityPasswordChangeBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.ktx.*
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class PasswordChangeActivity : AppCompatActivity() {
@@ -17,7 +17,7 @@ class PasswordChangeActivity : AppCompatActivity() {
     var auth = Firebase.auth
     var i = intent
     lateinit var googleclient: GoogleSignInClient
-
+    var loading=LoadingDialog(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +39,19 @@ class PasswordChangeActivity : AppCompatActivity() {
 
             if(infocheck())
             {
+                loading.startloading()
+                var handler= Handler()
+                handler.postDelayed(object : Runnable{
+                    override fun run()
+                    {
+                        loading.isdismis()
+                    }
+                },500)
+
                 Firebase.auth.currentUser!!.updatePassword(binding.signupemailnew.text.toString())
                 i = Intent(this, DashboardActivity::class.java)
                 startActivity(i)
+                finish()
             }
         }
     }
