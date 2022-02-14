@@ -1,8 +1,10 @@
 package com.example.logindemo
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 
 import com.example.logindemo.databinding.ActivitySignupBinding
@@ -22,6 +24,15 @@ import com.facebook.FacebookCallback
 import com.facebook.login.LoginManager
 
 import com.facebook.CallbackManager
+import com.google.firebase.firestore.FirebaseFirestore
+import androidx.annotation.NonNull
+
+import com.google.android.gms.tasks.OnFailureListener
+
+import com.google.firebase.firestore.DocumentReference
+
+import com.google.android.gms.tasks.OnSuccessListener
+
 
 
 
@@ -32,7 +43,7 @@ class SignUpActivity : AppCompatActivity() {
     var auth = Firebase.auth
     var i = intent
     lateinit var googleclient:GoogleSignInClient
-
+    var  db: FirebaseFirestore? = FirebaseFirestore.getInstance()
 
     companion object{
         const val sign=25
@@ -122,20 +133,41 @@ class SignUpActivity : AppCompatActivity() {
         var email = binding.signupemail.text.toString()
         var pass = binding.signuppass.text.toString()
 
-        auth.createUserWithEmailAndPassword(email, pass)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    var user = auth.currentUser
-                    user!!.sendEmailVerification()
-                        .addOnCompleteListener(this)
-                        { task ->
+
+        var user= hashMapOf(
+            "Email" to email,
+            "Password" to pass
+        )
+
+        var users=db!!.collection("User")
+        var query=users.whereEqualTo("Email",email).get()
+            .addOnSuccessListener {
+                    it->
+                if(it.isEmpty)
+                {
+                    auth.createUserWithEmailAndPassword(email, pass)
+                        .addOnCompleteListener(this) { task ->
                             if (task.isSuccessful) {
-                                Toast.makeText(this, "email sent is successfully", Toast.LENGTH_SHORT).show()
-                                startActivity(i)
+                                var user = auth.currentUser
+                                user!!.sendEmailVerification()
+                                    .addOnCompleteListener(this)
+                                    { task ->
+                                        if (task.isSuccessful) {
+
+                                            users.document(email).set(user)
+                                            Toast.makeText(this, "email sent is successfully", Toast.LENGTH_SHORT).show()
+                                            startActivity(i)
+                                        }
+                                    }
                             }
                         }
                 }
+                else{
+                    Toast.makeText(this,"email already register",Toast.LENGTH_SHORT).show()
+                    startActivity(i)
+                }
             }
+
     }
 
     private fun infocheck(): Boolean {
