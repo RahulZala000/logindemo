@@ -47,11 +47,17 @@ class PasswordChangeActivity : AppCompatActivity() {
                         loading.isdismis()
                     }
                 },500)
-
                 Firebase.auth.currentUser!!.updatePassword(binding.signupemailnew.text.toString())
-                i = Intent(this, DashboardActivity::class.java)
-                startActivity(i)
-                finish()
+                    .addOnCompleteListener{
+                        task->
+                        if(task.isSuccessful)
+                        {
+                            i = Intent(this, DashboardActivity::class.java)
+                            startActivity(i)
+                            finish()
+                        }
+                    }
+
             }
         }
     }

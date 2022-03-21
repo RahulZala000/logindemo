@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
     companion object{
         const val sign=25
     }
-    lateinit var progress:ProgressBar
     private lateinit var isdialog:AlertDialog
     var loading=LoadingDialog(this)
 
@@ -155,7 +154,6 @@ class MainActivity : AppCompatActivity() {
                 if(task.isSuccessful)
                 {
                     startActivity(i)
-
                 }
                 else
                 {
