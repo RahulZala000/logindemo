@@ -3,9 +3,12 @@
     <string name="client_id">806307821550-g6bn430lmqc1u7l8199v2push2e9917u.apps.googleusercontent.com</string>
 
 
-    <string name="facebook_app_id">2015820515257544</string>
-    <string name="fb_login_protocol_scheme">fb2015820515257544</string>
-    <string name="facebook_client_token">ee4b7e08eeba9701fd3a6d1da4268471</string>
+
+    <string name="facebook_app_id">754929585478710</string>
+    <string name="fb_login_protocol_scheme">fb754929585478710</string>
+    <string name="facebook_client_token">071d7d56783fef8f6d76ded3c7009ab8</string>
+
+
 
 
 </resources>

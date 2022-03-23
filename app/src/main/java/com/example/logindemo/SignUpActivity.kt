@@ -2,29 +2,26 @@ package com.example.logindemo
 
 
 
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.logindemo.databinding.ActivitySignupBinding
-import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
+import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-
+import java.util.*
 
 
 class SignUpActivity : AppCompatActivity() {
@@ -46,6 +43,8 @@ class SignUpActivity : AppCompatActivity() {
         binding= ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        callbackManager= CallbackManager.Factory.create()
+
         val gso = GoogleSignInOptions
             .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.client_id))
@@ -53,6 +52,23 @@ class SignUpActivity : AppCompatActivity() {
             .build()
 
         googleclient=GoogleSignIn.getClient(this,gso)
+
+        LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+            override fun onSuccess(result: LoginResult?) {
+                i = Intent(this@SignUpActivity, DashboardActivity::class.java)
+                Toast.makeText(this@SignUpActivity,""+result,Toast.LENGTH_SHORT).show()
+                startActivity(i)
+            }
+
+            override fun onCancel() {
+
+            }
+
+            override fun onError(error: FacebookException?) {
+
+            }
+            }
+        )
 
         binding.signupClick.setOnClickListener {
 
@@ -86,53 +102,15 @@ class SignUpActivity : AppCompatActivity() {
         }
         binding.loginButton.setOnClickListener{
 
-            Toast.makeText(baseContext,"click",Toast.LENGTH_SHORT).show()
+         facebooklogin()
 
-            callbackManager = CallbackManager.Factory.create()
-
-            binding.loginButton.setPermissions(listOf("email", "user_birthday"))
-
-           binding.loginButton.registerCallback(callbackManager, object :
-               FacebookCallback<LoginResult>{
-               override fun onSuccess(result: LoginResult?) {
-                    Log.d("@facebook","Success")
-                  // i=Intent(this@SignUpActivity,DashboardActivity::class.java)
-                   handleFacebookAccessToken(result!!.accessToken)
-                 //  startActivity(i)
-               }
-
-               override fun onCancel() {
-                   Toast.makeText(this@SignUpActivity,"canser",Toast.LENGTH_SHORT).show()
-               }
-
-               override fun onError(error: FacebookException?) {
-                   Toast.makeText(this@SignUpActivity,"error",Toast.LENGTH_SHORT).show()
-               }
-
-           })
         }
 
     }
-    private fun handleFacebookAccessToken(token: AccessToken) {
-        Log.d("TAG", "handleFacebookAccessToken:$token")
 
-        val credential = FacebookAuthProvider.getCredential(token.token)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithCredential:success")
-                    val user = auth.currentUser
-                    i= Intent(this,DashboardActivity::class.java)
-                    startActivity(i)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                   // updateUI(null)
-                }
-            }
+    fun facebooklogin()
+    {
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
     }
 
 
@@ -140,11 +118,14 @@ class SignUpActivity : AppCompatActivity() {
     {
         var signIntent=googleclient.signInIntent
         startActivityForResult(signIntent, sign)
-
     }
 
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        callbackManager.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
+
 
         if(requestCode== sign)
         {
@@ -159,6 +140,11 @@ class SignUpActivity : AppCompatActivity() {
             {
                 Toast.makeText(this,e.message,Toast.LENGTH_SHORT).show()
             }
+        }
+        else
+        {
+            i = Intent(this, DashboardActivity::class.java)
+            startActivity(i)
         }
     }
 

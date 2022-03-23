@@ -5,8 +5,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.logindemo.databinding.ActivityDashboardBinding
+import com.facebook.AccessToken
+import com.facebook.GraphRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -26,6 +29,8 @@ class DashboardActivity : AppCompatActivity() {
     lateinit var editor: SharedPreferences.Editor
     var loading=LoadingDialog(this)
 
+    var accessToken:AccessToken= AccessToken.getCurrentAccessToken()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityDashboardBinding.inflate(layoutInflater)
@@ -39,6 +44,18 @@ class DashboardActivity : AppCompatActivity() {
             .requestIdToken(getString(R.string.client_id))
             .requestEmail()
             .build()
+
+        val request = GraphRequest.newMeRequest(
+            accessToken
+        ) { `object`, response ->
+                var nm=`object`.getString("name")
+            binding.email.text=nm
+        }
+        val parameters = Bundle()
+        parameters.putString("fields", "id,name")
+        Toast.makeText(this,""+parameters.getString("name"),Toast.LENGTH_SHORT).show()
+        request.parameters = parameters
+        request.executeAsync()
 
         googleclient= GoogleSignIn.getClient(this,gso)
 
